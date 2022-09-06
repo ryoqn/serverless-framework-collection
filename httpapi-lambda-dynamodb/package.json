@@ -1,0 +1,24 @@
+{
+  "name": "httpapi-lambda",
+  "version": "1.0.0",
+  "description": "### nodeのローカル環境構築 ```sh nodenv local <node_version> ```",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "serverless": "^3.22.0",
+    "serverless-dynamodb-local": "^0.2.40",
+    "serverless-layers": "^2.5.4",
+    "serverless-offline": "^10.0.0",
+    "serverless-prune-plugin": "^2.0.1"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.163.0",
+    "@aws-sdk/util-dynamodb": "^3.163.0",
+    "uuid4": "^2.0.3"
+  }
+}

@@ -1,0 +1,184 @@
+service: httpapi-sample
+
+frameworkVersion: '3'
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  architecture: arm64
+  region: ap-northeast-1
+  stage: dev
+  profile: ${self:custom.profiles.${sls:stage}}
+  httpApi:
+    disableDefaultEndpoint: true
+    authorizers:
+      customAuthorizer:
+        type: request
+        functionName: authorizer
+        name: customAuthorizer
+        enableSimpleResponses: true
+        resultTtlInSeconds: 300
+        payloadVersion: '2.0'
+        identitySource:
+          - $request.header.X-My-Token
+        identityValidationExpression: someRegex
+    # cors:
+    #   allowedOrigins:
+    #     - '*'
+    #   allowedHeaders:
+    #     - Content-Type
+    #     - X-My-Token
+    #   allowedMethods:
+    #     - GET
+    #   maxAge: 6000 # In seconds
+  iam:
+    role:
+      managedPolicies:
+        - 'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess'
+
+custom:
+  profiles:
+    dev: ${env:PROFILE} # set aws profile at dev stage.
+    prod: ${env:PROFILE} # set aws profile at prod stage.
+    local: ${env:PROFILE} # set aws profile at local stage.
+  jest:
+    testTimeout: 30000
+  serverless-offline:
+    noAuth: true
+  serverless-layers:
+    layersDeploymentBucket: ${env:LAYERS_BUCKETNAME}-${aws:accountId}
+  prune:
+    automatic: true
+    number: 3
+  dynamodb:
+      stages:
+        - local
+      start:
+        port: 8000
+        inMemory: true
+        migrate: true
+        seed: true
+        convertEmptyValues: true
+
+package:
+  patterns:
+    - '!.prettierignore'
+    - '!.prettierrc'
+    - '!.jest.config.js'
+    - '!.eslintrc.yml'
+    - '!README.md'
+    - '!package.json'
+    - '!package-lock.json'
+    - '!.DS_Store'
+    - '!.git/**'
+    - '!.gitignore'
+
+functions:
+  create:
+    handler: src/handler.create
+    name: ${self:provider.stage}-${self:service}-create
+    environment:
+      REGION: ${self:provider.region}
+      TABLENAME: ${env:TABLENAME}
+    events:
+      - httpApi:
+          path: /user
+          method: POST
+          authorizer:
+            name: customAuthorizer
+
+  get:
+    handler: src/handler.get
+    name: ${self:provider.stage}-${self:service}-get
+    environment:
+      REGION: ${self:provider.region}
+      TABLENAME: ${env:TABLENAME}
+    events:
+      - httpApi:
+          path: /user/{user_id}
+          method: GET
+          authorizer:
+            name: customAuthorizer
+
+
+  update:
+    handler: src/handler.update
+    name: ${self:provider.stage}-${self:service}-update
+    environment:
+      REGION: ${self:provider.region}
+      TABLENAME: ${env:TABLENAME}
+    events:
+      - httpApi:
+          path: /user/{user_id}
+          method: PUT
+          authorizer:
+            name: customAuthorizer
+
+  delete:
+    handler: src/handler.delete
+    name: ${self:provider.stage}-${self:service}-delete
+    environment:
+      REGION: ${self:provider.region}
+      TABLENAME: ${env:TABLENAME}
+    events:
+      - httpApi:
+          path: /user/{user_id}
+          method: DELETE
+          authorizer:
+            name: customAuthorizer
+
+  authorizer:
+    name: ${self:provider.stage}-${self:service}-authorizer
+    handler: src/handler.authorizer
+
+resources:
+  Resources:
+    S3Bucket:
+      Type: 'AWS::S3::Bucket'
+      Properties:
+        BucketName: ${env:LAYERS_BUCKETNAME}-${aws:accountId}
+    DynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        # ハッシュキーのみでプライマリキーにする場合
+        # set Partition Key / Sort Key
+        AttributeDefinitions:
+          - AttributeName: UserId
+            AttributeType: S
+        # set the type of key
+        KeySchema:
+          - AttributeName: UserId
+            KeyType: HASH
+
+        # ハッシュキーとレンジキーでプライマリキーにする場合
+        # AttributeDefinitions:
+        #   - AttributeName: UserId
+        #     AttributeType: S
+        #   - AttributeName: UpdateTime
+        #     AttributeType: N
+        # # set the type of key
+        # KeySchema:
+        #   - AttributeName: UserId
+        #     KeyType: HASH
+        #   - AttributeName: UserId
+        #     KeyType: HASH
+        #   - AttributeName: UpdateTime
+        #     KeyType: RANGE
+
+        # set CapacityUnits
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TimeToLiveSpecification:
+          AttributeName: Expiration
+          Enabled: true
+        BillingMode: PAY_PER_REQUEST
+        # set table name
+        TableName: ${env:TABLENAME}
+
+plugins:
+  - serverless-prune-plugin
+  - serverless-layers
+  - serverless-offline
+  - serverless-dynamodb-local

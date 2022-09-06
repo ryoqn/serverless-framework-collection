@@ -21,6 +21,8 @@ custom:
     prod: ${env:PROFILE}                # set aws profile at prod stage.
     local: ${env:PROFILE}               # set aws profile at local stage.
   queue-name: "my-queue"
+  jest:
+    testTimeout: 30000
 
   serverless-offline-sqs:
     autoCreate: yes
@@ -34,12 +36,20 @@ functions:
     handler: handler.compute
     events:
       - sqs:
-          arn: arn:aws:sqs:${self:provider.region}:${aws:accountId}:${self:custom.sqs-name}
+          arn: arn:aws:sqs:${self:provider.region}:${aws:accountId}:${self:custom.queue-name}
           batchSize: 1
           maximumBatchingWindow: 0
           functionResponseType: ReportBatchItemFailures
           enabled: true
 
+resources:
+  Resources:
+    MyQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.queue-name}
+
 plugins:
   - serverless-offline-sqs      # order is important
   - serverless-offline
+  - serverless-jest-plugin

@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "httpapi-lambda-dynamodb-serverless-offline",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": ["--inspect", "--debug-port=9229"],
+      "cwd": "${workspaceFolder}/httpapi-lambda-dynamodb",
+      "env": {
+        "AWS_SDK_LOADING_CONFIG": "1"
+      },
+      "program": "${workspaceFolder}/httpapi-lambda-dynamodb/node_modules/serverless/bin/serverless.js",
+      "args": ["offline", "start", "-s", "local"],
+      "runtimeExecutable": "node",
+      "nodeVersionHint": 10,
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}
