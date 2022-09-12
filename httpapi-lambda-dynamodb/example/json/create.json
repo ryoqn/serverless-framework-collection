@@ -1,4 +1,6 @@
 {
+  "name": "user_123456",
   "first_name": "japan",
-  "last_name": "taro"
+  "last_name": "taro",
+  "email": "test@mail.com"
 }

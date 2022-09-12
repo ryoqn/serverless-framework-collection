@@ -1,38 +1,41 @@
 'use strict';
 
-const uuid4 = require('uuid4')
-const {putItemAsync} = require('../lib/database')
+const UserForm = require('./lib/form/userForm');
+const UserService = require('./lib/service/usersService');
 
 /**
- * 追加ハンドラ
+ * ユーザー追加ハンドラ
  * @param  {} event
  */
 module.exports.create = async (event) => {
   try {
     const body = JSON.parse(event['body']);
-    const first_name = body.first_name;
-    const last_name = body.last_name;
-    const user_id = uuid4();
-    const item = {
-      UserId: { S: `${user_id}` },
-      FirstName: { S: `${first_name}`},
-      LastName: { S: `${last_name}`}
-    };
-    await putItemAsync(process.env.TABLENAME, item);
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: 'create successed.' }, null, 2),
+    const name = body.name;
+    const firstName = body.first_name;
+    const lastName = body.last_name;
+    const email = body.email;
+
+    const service = new UserService();
+    const form = new UserForm(name, firstName, lastName, email);
+    const ret = await service.create(form);
+    if (ret) {
+      return {
+        statusCode: 201,
+      };
+    } else {
+      return {
+        statusCode: 500,
+      };
     }
   } catch (error) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ message: 'create failed.' }, null, 2),
-    }
+    };
   }
 };
 
 /**
- * 取得ハンドラ
+ * ユーザー取得ハンドラ
  * @param  {} event
  */
 module.exports.get = async (event) => {
@@ -50,7 +53,7 @@ module.exports.get = async (event) => {
 };
 
 /**
- * 更新ハンドラ
+ * ユーザー更新ハンドラ
  * @param  {} event
  */
 module.exports.update = async (event) => {
@@ -68,7 +71,7 @@ module.exports.update = async (event) => {
 };
 
 /**
- * 削除ハンドラ
+ * ユーザー削除ハンドラ
  * @param  {} event
  */
 module.exports.delete = async (event) => {

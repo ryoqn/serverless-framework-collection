@@ -52,14 +52,14 @@ custom:
     automatic: true
     number: 3
   dynamodb:
-      stages:
-        - local
-      start:
-        port: 8000
-        inMemory: true
-        migrate: true
-        seed: true
-        convertEmptyValues: true
+    stages:
+      - local
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+      seed: true
+      convertEmptyValues: true
 
 package:
   patterns:
@@ -100,7 +100,6 @@ functions:
           method: GET
           authorizer:
             name: customAuthorizer
-
 
   update:
     handler: src/handler.update
@@ -144,27 +143,36 @@ resources:
         # ハッシュキーのみでプライマリキーにする場合
         # set Partition Key / Sort Key
         AttributeDefinitions:
-          - AttributeName: UserId
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: userName
             AttributeType: S
         # set the type of key
         KeySchema:
-          - AttributeName: UserId
+          - AttributeName: pk
             KeyType: HASH
 
-        # ハッシュキーとレンジキーでプライマリキーにする場合
+        # ハッシュキーとレンジキーをプライマリキーにする場合
         # AttributeDefinitions:
-        #   - AttributeName: UserId
+        #   - AttributeName: hk
         #     AttributeType: S
-        #   - AttributeName: UpdateTime
+        #   - AttributeName: sk
         #     AttributeType: N
         # # set the type of key
         # KeySchema:
-        #   - AttributeName: UserId
+        #   - AttributeName: hk
         #     KeyType: HASH
-        #   - AttributeName: UserId
+        #   - AttributeName: sk
         #     KeyType: HASH
-        #   - AttributeName: UpdateTime
+        #   - AttributeName: sk
         #     KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: username-index
+            KeySchema:
+              - AttributeName: userName
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
 
         # set CapacityUnits
         ProvisionedThroughput:

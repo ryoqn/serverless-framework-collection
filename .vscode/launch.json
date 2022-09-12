@@ -11,7 +11,7 @@
         "AWS_SDK_LOADING_CONFIG": "1"
       },
       "program": "${workspaceFolder}/httpapi-lambda-dynamodb/node_modules/serverless/bin/serverless.js",
-      "args": ["offline", "start", "-s", "local"],
+      "args": ["offline", "start", "-s", "local", "--noTimeout"],
       "runtimeExecutable": "node",
       "nodeVersionHint": 10,
       "console": "integratedTerminal",
