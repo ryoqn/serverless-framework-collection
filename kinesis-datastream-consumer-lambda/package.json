@@ -1,0 +1,19 @@
+{
+  "name": "kinesis-datastream-consumer-lambda",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "### nodeのローカル環境構築 ```sh nodenv local <node_version> ```",
+  "dependencies": {
+    "serverless": "^3.19.0"
+  },
+  "devDependencies": {
+    "serverless-offline": "^8.8.0",
+    "serverless-offline-kinesis-streams": "^1.0.3"
+  }
+}
