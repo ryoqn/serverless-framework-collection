@@ -1,0 +1,49 @@
+service: sqs-consumer
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: dev
+  region: ap-northeast-1
+  profile: ${self:custom.profiles.${sls:stage}}
+
+custom:
+  profiles:
+    dev: test                 # set aws profile at dev stage.
+    prod: test                # set aws profile at prod stage.
+    local: test               # set aws profile at local stage.
+  que-name: MyFirstQueue
+
+  serverless-offline-sqs:
+    autoCreate: yes
+    apiVersion: '2012-11-05'
+    endpoint: http://127.0.0.1:9324
+    #    region: eu-west-1
+    accessKeyId: root
+    secretAccessKey: root
+
+functions:
+  compute:
+    handler: handler.compute
+    events:
+      - sqs:
+          arn: arn:aws:sqs:${self:provider.region}:${aws:accountId}:${self:custom.que-name}
+          batchSize: 1
+          maximumBatchingWindow: 0
+          functionResponseType: ReportBatchItemFailures
+          enabled: true
+    environment:
+      AWS_SDK_LOAD_CONFIG:1
+
+resources:
+  Resources:
+    MyFirstQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:custom.que-name}
+
+plugins:
+  - serverless-offline-sqs      # order is important
+  - serverless-offline
