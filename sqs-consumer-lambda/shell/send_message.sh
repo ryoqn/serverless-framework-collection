@@ -1,9 +1,9 @@
 #!/usr/bin/bash
 
-QUE_NAME=MyFirstQueue
+QUE_NAME=my-queue
 SQS_MSG=$(cat << EOS
 {
-  "sample": "sample",
+  "sample": "sample"
 }
 EOS
 )

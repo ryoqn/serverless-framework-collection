@@ -2,7 +2,7 @@
 
 ### nodeのローカル環境構築
 ```sh
-nodenv local {node_version}
+nodenv local <node_version>
 ```
 
 ```sh
@@ -20,16 +20,12 @@ npx sls create --template aws-nodejs --name sqs-consumer-lambda
 ```
 
 ## ローカル実行方法
-### プロファイル設定
-```sh
-export AWS_PROFILE={profile}
-```
 ### プラグインのインストール
 serverless-offline
 ```sh
 npm install serverless-offline -D
 ```
-serveless-offline-sqs
+serverless-offline-sqs
 ```sh
 npm install serverless-offline-sqs -D
 ```
@@ -51,8 +47,9 @@ docker compose up -d
 ### コンシューマー起動
 #### コンソールから
  ```sh
+export AWS_PROFILE=<profile>
 export AWS_SDK_LOAD_CONFIG=1
-npx sls start offline -s {stage}
+npx sls offline start -s <stage>
 ```
 ### IDEから(IntelliJ IDEA)
 実行構成で以下を設定しDebugを実行するとステップ実行可能
