@@ -27,7 +27,7 @@ const client = new DynamoDBClient(options);
  * 単一アイテム追加
  * @param  {string} tableName
  * @param  {Item} item https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-dynamodb/interfaces/putitemcommandinput.html#item
- * @return {} 追加結果 https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-dynamodb/interfaces/putitemcommandoutput.html
+ * @return {PutItemCommandOutput} 追加結果 https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-dynamodb/interfaces/putitemcommandoutput.html
  */
 const putItemAsync = async (tableName, item) => {
   try {
@@ -45,6 +45,7 @@ const putItemAsync = async (tableName, item) => {
  * アイテム追加（トランザクション）
  * @param  {string} tableName
  * @param  {Array<Item>} items
+ * @return {TransactWriteItemsCommandOutput}
  */
 const transactWriteItems = async (tableName, items) => {
   try {
@@ -104,7 +105,7 @@ const updateItemAsync = async (tableName, item) => {
  * @param  {string} type(S/N/)
  * @return {object} アイテム（見つからなかった場合はnull)
  */
-const getItemByPrimalyKeyAsync = async (tableName, primaryKey, type, value) => {
+const getItemByPrimaryKeyAsync = async (tableName, primaryKey, type, value) => {
   const params = {
     TableName: tableName,
     KeyConditionExpression: `${primaryKey} = :value`,
@@ -195,7 +196,7 @@ const splitBatchWriteItems = (items, splitCount = 25) => {
 module.exports = {
   writeItemsAsync: writeItemsAsync,
   putItemAsync: putItemAsync,
-  getItemByPrimalyKeyAsync: getItemByPrimalyKeyAsync,
+  getItemByPrimaryKeyAsync: getItemByPrimaryKeyAsync,
   getItemByGSIAsync: getItemByGSIAsync,
   updateItemAsync: updateItemAsync,
   deleteItemByPrimaryKeyAsync: deleteItemByPrimaryKeyAsync,

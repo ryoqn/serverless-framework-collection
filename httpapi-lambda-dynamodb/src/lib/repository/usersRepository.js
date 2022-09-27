@@ -7,13 +7,13 @@ const PrimaryKey = 'pk';
 const IndexName = 'username-index';
 
 /**
+ * ユーザー作成
  * @param  {UserEntity} entity
  */
 const createUser = async (entity) => {
   entity.userId = crypto.randomUUID();
   const items = getPutItems(entity);
   const res = await db.transactWriteItems(TableName, items);
-  await getUserByName(entity.userName);
   if (200 == res.$metadata.httpStatusCode) {
     return true;
   } else {
@@ -23,15 +23,17 @@ const createUser = async (entity) => {
 };
 
 /**
+ * ユーザー取得（ID指定）
  * @param  {string} userId
- * @return {UserEntity}
+ * @return {UserEntity} UserEntity(null: if not found, not null: found)
  */
 const getUserById = async (userId) => {
-  const item = await db.getItemByPrimalyKeyAsync(TableName, PrimaryKey, 'S', userId);
+  const item = await db.getItemByPrimaryKeyAsync(TableName, PrimaryKey, 'S', userId);
   return convertItemToEntity(item);
 };
 
 /**
+ * ユーザー取得（ユーザー名指定）
  * @param  {string} userName
  * @param  {UserEntity}
  */
@@ -41,16 +43,12 @@ const getUserByName = async (userName) => {
 };
 
 /**
- * @return  {Array<UserEntity>}
- */
-const getAllUser = async () => {};
-
-/**
+ * ユーザー削除（ID指定）
  * @param  {string} userId
  * @return {boolean} true: success,  false: fail
  */
 const deleteUserById = async (userId) => {
-  const item = await db.getItemByPrimalyKeyAsync(TableName, PrimaryKey, 'S', userId);
+  const item = await db.getItemByPrimaryKeyAsync(TableName, PrimaryKey, 'S', userId);
   const entity = convertItemToEntity(item);
   if (null == entity) {
     return false;
@@ -68,6 +66,7 @@ const deleteUserById = async (userId) => {
 };
 
 /**
+ * ユーザー削除（ユーザー名指定）
  * @param  {string} userName
  */
 const deleteUserByName = async (userName) => {
@@ -90,11 +89,27 @@ const deleteUserByName = async (userName) => {
 };
 
 /**
- * @param  {} userId
+ * ユーザー更新（ユーザー名指定）
+ * @param  {string} userName
+ * @param  {userForm} form
+ * @return {boolean} true: success, false: fail
  */
-const updateUser = async (userId) => {
-  // TODO:impl
-  console.log(userId);
+const updateUserByName = async (userName, form) => {
+  const entity = await getUserByName(userName);
+  if (null == entity) {
+    return false;
+  }
+  entity.firstName = form.firstName;
+  entity.lastName = form.lastName;
+  const updateItem = getPutItems(entity);
+
+  const res = await db.updateItemAsync(TableName, updateItem);
+  if (200 == res.$metadata.httpStatusCode) {
+    return true;
+  } else {
+    console.error(`${res.name} \n ${res.message}`);
+    return false;
+  }
 };
 
 /**
@@ -182,8 +197,7 @@ module.exports = {
   createUser: createUser,
   getUserById: getUserById,
   getUserByName: getUserByName,
-  getAllUser: getAllUser,
   deleteUserById: deleteUserById,
   deleteUserByName: deleteUserByName,
-  updateUser: updateUser,
+  updateUserByName: updateUserByName,
 };

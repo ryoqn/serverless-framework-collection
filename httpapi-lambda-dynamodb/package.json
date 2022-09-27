@@ -1,11 +1,13 @@
 {
-  "name": "httpapi-lambda",
+  "name": "httpapi-lambda-dynamodb",
   "version": "1.0.0",
   "description": "### nodeのローカル環境構築 ```sh nodenv local <node_version> ```",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "cd .. && husky install httpapi-lambda-dynamodb/.husky",
+    "lint:eslint": "eslint .",
+    "lint:fix": "eslint --fix .",
     "format": "prettier --write .",
     "lint-staged": "lint-staged"
   },

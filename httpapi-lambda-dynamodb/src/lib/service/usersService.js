@@ -11,18 +11,44 @@ module.exports = class UserService {
     return await repo.createUser(entity);
   }
 
-  // TODO: impl
-  // getUserById(id) {}
+  /**
+   * @param  {string} id
+   * @return {UserEntity} entity
+   */
+  async getUserById(userId) {
+    return await repo.getUserById(userId);
+  }
 
-  // getUserByName(name) {}
+  /**
+   * @param  {string} userName
+   * @return {UserEntity} entity
+   */
+  async getUserByName(userName) {
+    return await repo.getUserByName(userName);
+  }
 
-  // getAllUser() {}
+  /**
+   * @param  {string} userId
+   * @return {boolean} true: success, false: fail
+   */
+  async deleteUserById(userId) {
+    return await repo.deleteUserById(userId);
+  }
 
-  // deleteUserById(id) {}
+  /**
+   * @param  {string} userId
+   * @return {boolean} true: success, false: fail
+   */
+  async deleteUserByName(userName) {
+    return await repo.deleteUserByName(userName);
+  }
 
-  // deleteUserByName() {}
-
-  // updateUser() {}
-
-  // createUserId() {}
+  /**
+   * update userEntity with UserForm
+   * @param  {UserForm} userForm
+   * @return {boolean} true: success, false: fail
+   */
+  async updateUser(userForm) {
+    return await repo.updateUserByName(userForm.userName);
+  }
 };
